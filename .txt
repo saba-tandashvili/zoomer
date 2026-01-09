@@ -1,0 +1,220 @@
+const input = document.querySelector(".search input");
+const items = document.querySelectorAll(".item");
+const banners = document.querySelectorAll(".banner");
+const titles = document.querySelectorAll(".section-title");
+const carousels = document.querySelectorAll(".carousel-wrap");
+
+const hideBlocks = document.querySelectorAll(
+  ".promo-wrap, .promo-wrap2, .promo-wrap3, .promo-wrap4, .promo-grid-wrap, .promo-grid-wrap2, .brand-banner, .brands-wrap"
+);
+
+
+if (input) {
+  input.addEventListener("input", () => {
+    let inputlowc = input.value.toLowerCase();
+    let searching = inputlowc !== "";
+
+    banners.forEach((bannerz) => (bannerz.style.display = searching ? "none" : ""));
+    hideBlocks.forEach((bannerz) => (bannerz.style.display = searching ? "none" : ""));
+
+    titles.forEach((titlez) => (titlez.style.display = searching ? "none" : ""));
+    carousels.forEach((c) => {
+      c.style.display = searching ? "none" : "";
+      c.firstElementChild.style.gridTemplateColumns = "";
+    });
+
+    items.forEach((item) => {
+      let name = item.querySelector(".name")?.textContent.toLowerCase() || "";
+      item.style.display = !searching || name.includes(q) ? "" : "none";
+    });
+
+    carousels.forEach((carouselz) => {
+      let grid = carouselz.firstElementChild;
+      let hasVisible = grid.querySelector(
+        ".item:not([style*='display: none'])"
+      );
+
+      if (hasVisible && searching) {
+        carouselz.style.display = "";
+        grid.style.gridTemplateColumns =
+          "repeat(auto-fill, minmax(200px, 1fr))";
+
+        let title = carouselz.previousElementSibling;
+        if (title && title.className.startsWith("section-title")) {
+          title.style.display = "";
+        }
+      }
+    });
+  });
+}
+
+let scrollup = document.querySelector(".scrollup");
+
+window.addEventListener("scroll", () => {
+  scrollup.style.display = window.scrollY > 200 ? "block" : "none";
+});
+
+scrollup.addEventListener("click", () => {
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth",
+  });
+});
+
+let nav = document.querySelector(".navigation");
+nav.addEventListener("click", () => {
+  window.open("nav.html", "_self");
+});
+
+const cart = document.querySelector(".cart");
+const cartbtn = document.querySelector(".cartbtn");
+const pricep = document.querySelector(".pricep");
+
+let cleart;
+
+cartbtn.addEventListener("mouseenter", () => {
+  clearTimeout(cleart);
+  cart.style.display = "block";
+});
+
+cartbtn.addEventListener("mouseleave", () => {
+  cleart = setTimeout(() => {
+    cart.style.display = "none";
+  }, 150);
+});
+
+cart.addEventListener("mouseenter", () => {
+  clearTimeout(cleart);
+  cart.style.display = "block";
+});
+
+cart.addEventListener("mouseleave", () => {
+  cleart = setTimeout(() => {
+    cart.style.display = "none";
+  }, 150);
+});
+
+const buybtns = document.querySelectorAll(".buy");
+const main = document.querySelector(".main");
+
+buybtns.forEach((buybtn) => {
+  buybtn.addEventListener("click", (e) => {
+    const item = e.target.parentElement.parentElement;
+    const productname = item.querySelector(".name").textContent;
+    const productprice = item.querySelector(".price").textContent;
+    const productimg = item.querySelector(".item-img").getAttribute("src");
+
+
+
+    function shortenText(text) {
+  const words = text.split(" ");
+
+  if (words.length <= 4) return text;
+
+  return words.slice(0, 4).join(" ") + "\n" + words.slice(4, 6).join(" ") + " ...";
+}
+
+
+    function addnew() {
+      const newdiv = document.createElement("div");
+      main.appendChild(newdiv);
+      newdiv.classList.add("cartdiv");
+      const mainimg = main.querySelector(".imgza");
+      mainimg.style.display = "none";
+
+
+
+      const cartimg = document.createElement("img")
+      newdiv.appendChild(cartimg)
+      cartimg.classList.add("cartimg")
+      cartimg.src = productimg
+
+
+      const cartrow = document.createElement("div");
+      newdiv.appendChild(cartrow);
+      cartrow.classList.add("cartrow");
+
+
+      const cartname = document.createElement("p");
+      cartrow.appendChild(cartname);
+      cartname.classList.add("cartname");
+      cartname.textContent = productname;
+      cartname.textContent = shortenText(cartname.textContent);
+
+
+      const cartprice = document.createElement("p")
+      cartrow.appendChild(cartprice)
+      cartprice.classList.add("cartprice")
+      cartprice.textContent = productprice
+
+
+
+
+      const cartrow2 = document.createElement("div");
+      newdiv.appendChild(cartrow2);
+      cartrow2.classList.add("cartrow2");
+
+      const dlt = document.createElement("img");
+      cartrow2.appendChild(dlt)
+      dlt.classList.add("dlt")
+      dlt.src = "images-icons/image copy 158.png"
+      dlt.addEventListener("click", () => {
+        newdiv.remove()
+        updatetotal()
+      })
+      
+
+
+
+      const adder = document.createElement("div");
+      cartrow2.appendChild(adder)
+      adder.classList.add("adder")
+
+
+
+      const minus = document.createElement("p");
+      adder.appendChild(minus)
+      minus.classList.add("minus")
+      minus.textContent = "-"
+      minus.addEventListener("click", () => {
+        let currentNum = parseInt(numz.textContent);
+        if (currentNum > 1) {
+          numz.textContent = currentNum - 1;
+          updatetotal()
+        }
+      });
+      
+
+      const numz = document.createElement("p");
+      adder.appendChild(numz)
+      numz.classList.add("numz")
+      numz.textContent = "1"
+
+      const plus = document.createElement("p");
+      adder.appendChild(plus)
+      plus.classList.add("plus")
+      plus.textContent = "+"
+      plus.addEventListener("click", () => {
+        let currentNum = parseInt(numz.textContent);
+        numz.textContent = currentNum + 1;
+        updatetotal()
+      });
+    }
+
+function updatetotal() {
+  const cartItems = document.querySelectorAll(".cartdiv");
+  let total = 0;
+
+  cartItems.forEach((item) => {
+    const price = item.querySelector(".cartprice").textContent.replace(" ₾", "");
+    const quantity = item.querySelector(".numz").textContent;
+    total += price * quantity; 
+  });
+
+  pricep.textContent = total + " ₾";
+}
+
+    addnew();
+    updatetotal();
+  });
+});
